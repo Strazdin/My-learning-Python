@@ -1,0 +1,314 @@
+Работа над ошибками по прошлому ДЗ (тема SQL-2)
+
+Задание 5. Восстановите строки, удаленные в 3 пункте.
+
+Комментарий преподавателя:
+В 5 пункте это делается с помощью команд INSERT INTO table_name VALUES(тут все значения)
+
+Решение:
+
+INSERT INTO Ware (ID, Produce, Material, Color, Size, Country, ID_salespeople, Price, Count, REM)
+VALUES
+	(1001, "CKN-002", "кожзам", "ч", "39x30x6,4", "Германия", 2001, 143, 2, "Notebrief (13,2"")");
+
+
+INSERT INTO Ware (ID, Produce, Material, Color, Size, Country, ID_salespeople, Price, Count, REM)
+VALUES
+	(1017, "PON-303BK", "полиэстер", "ч", "44,5х33,7х5,1", "Германия", 2015, 110, 29, "Large Expandable computer brief (17"")");
+
+INSERT INTO Ware (ID, Produce, Material, Color, Size, Country, ID_salespeople, Price, Count, REM)
+VALUES
+	(1026, "(F8E157eaLRG)", "полиэстер/нейлон", "ч", "38,1x28x70", "Германия", 2014, 126, 0, "Stone Street Case (15)")
+
+...........................
+...........................
+...........................
+
+и т.д
+
+Задание 11. Определите все сумки из кожи с размером не менее 40х30х5
+
+Комментарий преподавателя:
+В 11 пункте вам надо было просто условия поставить, а строки всё равно сравнивались бы корректно
+
+Решение:
+
+SELECT *
+FROM Ware
+Where Material = 'кожа' AND Size >= '40х30х5'
+
+Задание 19. Напишите запрос, который покажет все сумки с размером более 15 дюймов.
+
+Комментарий преподавателя:
+В 19 пункте вам нужно были найти сумки по полю REM
+В тех полях есть значения дюймов. 
+
+Решение:
+
+Отсутствует. 
+
+Мой комментарий:
+
+SELECT REM
+FROM Ware
+WHERE REM > ???????
+
+Так и не понял(
+===============================================================================================================
+ 	ДЗ (тема SQL-3)
+ 	файл db5:
+
+1.	Показать какие продавцы продают какие товары.
+
+SELECT s.seller, sg.Goods
+FROM Seller s, SallerGoods sg
+WHERE s.INNSeller = sg.INNSeller
+
+2.	Вывести продавцов и клиентов (пары), связанные м/у собой приобретенным товаром.
+
+SELECT s.Seller, c.Client
+FROM Seller s, Client c, SallerGoods sg, ClientGoods cg
+WHERE s.INNSeller = sg.INNSeller AND sg.ID = cg.ID AND cg.INNClient = c.INNClient
+
+3.	Вывести данные о товаре в алфавитном порядке.
+
+SELECT sg.DateStart, sg.Goods, sg.CostUnit, sg.Count
+FROM SallerGoods sg
+ORDER BY Goods asc
+
+4.	Вывести посредников, поставляющих товар для фирмы.
+
+SELECT c.Client
+FROM Client c
+WHERE c.Status = 'посредник'
+
+5.	Вывести список товара, поставляемого производителями.
+
+SELECT sg.Goods
+FROM Seller s, SallerGoods sg
+WHERE s.INNSeller = sg.INNSeller AND s.Status = 'производитель'
+
+6.	На какую сумму было всего куплено каждого товара фирмой.
+
+SELECT c.Client, sg.Goods, sg.CostUnit * sg.Count AS "Общая сумма"
+FROM Client c, ClientGoods cg, SallerGoods sg
+WHERE c.INNClient = cg.INNClient AND cg.ID = sg.ID
+ORDER BY c.Client
+
+7.	На какую сумму было продано каждого товара магазинам.
+
+SELECT c.Client, sg.Goods, сg.CostUnit * сg.Count AS "Сумма продажи"
+FROM Client c, ClientGoods cg, SallerGoods sg
+WHERE c.INNClient = cg.INNClient AND cg.ID = sg.ID AND c.Status = 'магазин'
+ORDER BY c.Client
+
+8.	Выведите список товара, проданного в кафе.
+
+SELECT c.Client, sg.Goods
+FROM Client c, ClientGoods cg, SallerGoods sg
+WHERE c.INNClient = cg.INNClient AND cg.ID = sg.ID AND c.Status = 'кафе'
+
+9.	Определить какой товар был куплен у посредников.
+
+SELECT s.Seller, sg.Goods
+FROM Seller s, SallerGoods sg
+WHERE s.INNSeller = sg.INNSeller AND s.Status = 'посредник'
+
+10.	Написать запрос, который выводит название товара и прибыль, полученную от его продажи (при продаже всех единиц товара).
+
+SELECT sg.Goods, ROUND(sg.CostUnit * sg.Count, 1) AS 'Прибыль'
+FROM SallerGoods sg
+
+11.	 Определите какие клиенты не покупали подсолнечное масло.
+
+SELECT c.Client
+FROM Client c, ClientGoods cg, SallerGoods sg
+WHERE c.INNClient = cg.INNClient AND cg.ID = sg.ID AND sg.Goods != 'масло подсолнечное'
+
+12.	Определите поставщиков, сделки с которыми заключили 10-11/11/2007.
+
+SELECT s.Seller
+FROM Seller s, SallerGoods sg
+WHERE s.INNSeller = sg.INNSeller AND (sg.DateStart = '2007-11-10 00:00:00' OR sg.DateStart = '2007-11-11 00:00:00')
+GROUP BY s.Seller
+
+13.	Показать код и наименование товара, купленного посредниками.
+
+SELECT sg.Code, sg.Goods
+FROM Seller s, SallerGoods sg
+WHERE s.Status = 'посредник'
+GROUP BY sg.Code
+
+14.	Вывести список клиентов и сумму прибыли за каждый товар, полученную от продажи черного перца.
+
+SELECT c.Client, cg.CostUnit * cg.Count AS 'Сумма прибыли'
+FROM Client c, ClientGoods cg, SallerGoods sg
+WHERE sg.ID = cg.ID AND cg.INNClient = c.INNClient AND sg.Goods LIKE 'Перец черный%'
+GROUP BY c.Client
+
+15.	 Выведите список товаров в обратном порядке, если товар куплен у производителя и продан в кафе.
+
+SELECT sg.Goods
+FROM Client c, Seller s, ClientGoods cg, SallerGoods sg
+WHERE s.INNSeller = sg.INNSeller AND sg.ID = cg.ID AND cg.INNClient = c.INNClient AND s.Status = 'производитель' AND c.Status = 'кафе'
+GROUP BY sg.Goods
+ORDER BY sg.Goods DESC
+
+
+16.	Вывести список товаров, если фирма купила их на сумму больше 1000.
+
+SELECT sg.Goods, c.Client
+FROM Client c, Seller s, ClientGoods cg, SallerGoods sg
+WHERE s.INNSeller = sg.INNSeller AND sg.ID = cg.ID AND cg.INNClient = c.INNClient AND cg.CostUnit * cg.Count > 1000
+=========================================================================================================================
+ 	Файл db6:
+
+1.	Сосчитать количество клиентов, покупающих товар.
+
+SELECT COUNT(c.Client) AS 'Кол-во клиентов'
+FROM Client c
+
+2.	Сколько посредников поставляют товар для фирмы.
+
+SELECT COUNT(c.Client) AS 'Кол-во посредников'
+FROM Client c
+WHERE c.Status = 'посредник'
+
+3.	Вывести среднюю сумму сделки по проданному товару.
+
+SELECT ROUND(AVG(cg.CostUnit * cg.Count), 1) AS 'Средняя сумма сделки'
+FROM ClientGoods cg
+
+4.	Посчитать на какую сумму было всего поставлено товара.
+
+SELECT ROUND(SUM(sg.CostUnit * sg.Count), 1) AS 'Сумма поставленного товара'
+FROM SallerGoods sg
+
+5.	Определите максимальное количество закупленного товара шт.(кг)
+
+SELECT MAX(cg.Count) AS 'Максимальное кол-во товара закуплено:'
+FROM ClientGoods cg
+
+6.	Какая минимальная сумма покупки, на которую клиент сделал заказ.
+
+SELECT MIN(cg.CostUnit * cg.Count) AS 'Минимальная сумма покупки'
+FROM ClientGoods cg
+
+7.	Посчитать на какую сумму было продано товара магазинам.	
+
+SELECT SUM(cg.CostUnit * cg.Count) AS 'Сумма, где товар был продан магазинам'
+FROM Client c, ClientGoods cg
+WHERE c.Status = 'магазин'
+
+8.	Сосчитать общее количество видов закупленных фирмой вафель.
+
+SELECT COUNT(sg.Goods)
+FROM SallerGoods sg
+WHERE sg.Goods LIKE 'Вафли%'
+
+9.	Выведите среднюю цену на растительное масло (закупочную).
+
+SELECT AVG(sg.CostUnit * sg.Count) AS 'Средняя цена на растительное масло'
+FROM SallerGoods sg
+WHERE sg.Goods LIKE 'масло%' AND sg.Goods != 'масло сливочное'
+
+10.	Определите сколько всего было продано килограмм яблок.
+
+SELECT SUM(cg.Count) AS 'Килограмм яблок продано'
+FROM  ClientGoods cg, SallerGoods sg
+WHERE cg.ID = sg.ID AND sg.Goods LIKE 'Яблоки%'
+
+11.	Определите какое количество картофеля закупили кафе.
+
+SELECT SUM(cg.Count) AS 'Кол-во картофеля закупили кафе:'
+FROM Client c, ClientGoods cg, SallerGoods sg
+WHERE cg.ID = sg.ID AND c.INNClient = cg.INNClient AND sg.Goods LIKE 'Картофель%' AND c.Status = 'кафе'
+
+12.	Посчитать сколько клиентов купили перец черный молотый.
+
+SELECT COUNT(c.Client) AS 'Купили перца черного молотого клиентов:'
+FROM Client c, ClientGoods cg, SallerGoods sg
+WHERE cg.ID = sg.ID AND c.INNClient = cg.INNClient AND sg.Goods = 'Перец черный молотый'
+
+13.	Определить сколько наименований товара было куплено у посредников.
+
+SELECT Count(sg.Goods)
+FROM Seller s, SallerGoods sg
+WHERE s.INNSeller = sg.INNSeller AND s.Status = 'посредник'
+
+14.	Определить минимальную цену за единицу проданного товара.
+
+SELECT MIN(cg.CostUnit)
+FROM ClientGoods cg
+
+15.	Определите минимальную сумму на какую было закуплено товара.
+
+SELECT MIN(cg.CostUnit * cg.Count)
+FROM ClientGoods cg
+
+16.	Определить максимальную сумму за товар, проданный магазинам.
+
+SELECT MAX(cg.CostUnit)
+FROM ClientGoods cg, Client c
+WHERE c.INNClient = cg.INNClient AND c.Status = 'магазин'
+
+17.	Определить со сколькими фирмами сотрудничает данная фирма.
+
+SELECT s.Seller, COUNT(c.Client)
+FROM Client c, Seller s, ClientGoods cg, SallerGoods sg
+WHERE s.INNSeller = sg.INNSeller AND sg.ID = cg.ID AND cg.INNClient = c.INNClient
+GROUP BY s.Seller
+
+18.	Определить минимальную сумму сделки по закупке товара у производителей.
+
+SELECT MIN(sg.CostUnit * sg.Count)
+FROM Seller s, SallerGoods sg
+WHERE s.INNSeller = sg.INNSeller AND s.Status = 'производитель'
+
+19.	Определить среднюю цену за пачку чая при покупке.
+
+SELECT AVG(sg.CostUnit)
+FROM SallerGoods sg
+WHERE sg.Goods LIKE 'Чай%'
+
+20.	Определите максимальную сумму прибыли за товар, проданный посреднику.
+
+SELECT MAX(sg.CostUnit * sg.Count)
+FROM Client c, ClientGoods cg, SallerGoods sg
+WHERE sg.ID = cg.ID AND cg.INNClient = c.INNClient AND c.Status = 'посредник'
+
+21.	 Определите минимальную прибыль за товар, купленный у посредника.
+
+SELECT MIN(cg.CostUnit * cg.Count)
+FROM Seller s, ClientGoods cg, SallerGoods sg
+WHERE s.INNSeller = sg.INNSeller AND sg.ID = cg.ID AND s.Status = 'посредник'
+
+22.	 Какое количество наименований товара куплено у фирмы.
+
+SELECT COUNT(sg.Count)
+FROM Seller s, SallerGoods sg
+WHERE s.INNSeller = sg.INNSeller AND s.Status = 'производитель'
+
+23.	 Сколько в продаже видов печенья.
+
+SELECT COUNT(sg.Goods)
+FROM SallerGoods sg
+WHERE sg.Goods LIKE 'Печенье%'
+
+24.	 Какая максимальная сумма покупки, на которую клиент сделал заказ.
+
+SELECT MAX(cg.Count * cg.CostUnit)
+FROM ClientGoods cg
+
+25.	 Определите среднюю прибыль от перепродажи масла.
+
+SELECT cg.CostUnit * cg.Count / cg.Count * COUNT(sg.Goods)
+FROM ClientGoods cg, SallerGoods sg
+WHERE sg.Goods GLOB "масло*"
+
+26.	 Со сколькими посредниками сотрудничает фирма.
+
+SELECT s.Seller, COUNT(c.Status)
+FROM Client c, Seller s, ClientGoods cg, SallerGoods sg
+WHERE s.INNSeller = sg.INNSeller AND sg.ID = cg.ID AND cg.INNClient = c.INNClient AND c.Status = 'посредник'
+GROUP BY s.Seller
